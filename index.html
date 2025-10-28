@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>| Lista de Chequeo Personal |</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="public/src/components/sweet.css">
+</head>
+<body class="h-full text-slate-100/95">
+<div class="bg-aurora">
+<main class="flex items-start justify-center">
+  <div x-data="checklistApp()" x-init="init()" class="w-full max-w-6xl grid md:grid-cols-[260px_1fr] gap-4">
+
+    <!-- === PANEL IZQUIERDO: CATEGORÍAS === -->
+    <aside class="glass rounded-2xl border border-white/15 flex flex-col h-[82vh]">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="flex items-center gap-2 text-sm font-semibold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 5h18M9 3v4m6-4v4M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9z"/></svg>
+          Categorías
+        </h2>
+        <button @click="showNewCategory=true; $nextTick(()=> $refs.newCat?.focus())"
+          class="btn rounded-md border border-white/20 hover:border-white/40 hover:bg-white/5 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nueva
+        </button>
+      </div>
+
+      <template x-if="showNewCategory">
+        <form @submit.prevent="addCategory()" class="flex items-center gap-1.5 mb-2">
+          <input x-ref="newCat" x-model.trim="newCategory" type="text" placeholder="Nombre de categoría"
+            class="w-full px-2.5 py-1.5 rounded-md bg-white/10 border border-white/20 placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-emerald-400/60">
+          <button class="btn bg-emerald-500/90 hover:bg-emerald-500 text-white rounded-md">Agregar</button>
+        </form>
+      </template>
+
+      <nav class="space-y-1 overflow-y-auto thin-scroll pr-1 flex-1">
+        <button @click="filter='all'" :class="filter==='all' ? 'bg-emerald-400/20 border-emerald-300/40' : 'hover:bg-white/5'"
+          class="btn w-full text-left px-2.5 py-1.5 rounded-md border border-white/15 flex items-center justify-between">
+          <span>Todas</span><span class="text-xs bg-white/10 px-1.5 py-0.5 rounded-md" x-text="tasks.length"></span>
+        </button>
+
+        <template x-for="cat in categories" :key="cat.id">
+          <div class="flex items-center gap-1">
+            <button @click="filter=cat.id"
+              :class="filter===cat.id ? 'bg-emerald-400/20 border-emerald-300/40' : 'hover:bg-white/5'"
+              class="btn flex-1 text-left px-2.5 py-1.5 rounded-md border border-white/15 flex items-center justify-between">
+              <span x-text="cat.name"></span>
+              <span class="text-xs bg-white/10 px-1.5 py-0.5 rounded-md" x-text="countByCategory(cat.id)"></span>
+            </button>
+            <button @click="askDeleteCategory(cat.id)" class="btn p-1.5 rounded-md hover:bg-red-500/10 border border-white/10" title="Eliminar categoría">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2m-9 0h10"/></svg>
+            </button>
+          </div>
+        </template>
+      </nav>
+    </aside>
+
+    <!-- === PANEL DERECHO: LISTA === -->
+    <section class="glass rounded-2xl border border-white/15 flex flex-col h-[82vh] p-3">
+      <header class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+          <h1 class="font-semibold text-lg">Lista de Chequeo</h1>
+        </div>
+        <p class="text-xs text-slate-300/70" x-text="subtitle()"></p>
+      </header>
+
+      <!-- Filtros -->
+      <div class="glass-2 border border-white/10 rounded-md p-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div class="flex items-center gap-1.5 text-xs">
+          <span>Filtrar:</span>
+          <select x-model="stateFilter" class="flex-1">
+            <option value="all">Todos</option>
+            <option value="pending">Pendientes</option>
+            <option value="done">Completados</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs">
+          <span>Categoría:</span>
+          <select x-model="filter" class="flex-1">
+            <option value="all">Todas</option>
+            <template x-for="cat in categories" :key="cat.id">
+              <option :value="cat.id" x-text="cat.name"></option>
+            </template>
+          </select>
+        </div>
+        <div class="flex justify-end">
+          <button @click="askClearCompleted()" :disabled="!hasCompleted()"
+            class="btn border border-white/20 hover:border-white/40 hover:bg-white/5 disabled:opacity-40 text-xs rounded-md">
+            Eliminar completados
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulario Nueva tarea -->
+      <form @submit.prevent="addTask()" class="mt-2" data-compact="false">
+        <input x-model.trim="newTask" type="text" placeholder="Nueva tarea..." class="px-3 py-2 rounded-md bg-white/10 border border-white/20 placeholder-white/60 focus:outline-none focus:ring-1 focus:ring-emerald-400/60">
+        <select x-model="newTaskCategory">
+          <option value="">— Selecciona categoría —</option>
+          <template x-for="cat in categories" :key="cat.id">
+            <option :value="cat.id" x-text="cat.name"></option>
+          </template>
+        </select>
+        <button class="btn bg-emerald-500/90 hover:bg-emerald-500 font-semibold rounded-md">Agregar</button>
+      </form>
+
+      <!-- Lista -->
+      <div class="flex-1 overflow-y-auto thin-scroll pr-1 mt-2 space-y-1.5">
+        <template x-if="visibleTasks().length===0">
+          <p class="text-xs text-slate-200/70">Sin tareas para mostrar.</p>
+        </template>
+        <template x-for="t in visibleTasks()" :key="t.id">
+          <div class="group glass-2 border border-white/10 rounded-md flex items-center gap-2 p-2">
+            <input type="checkbox" :checked="t.done" @change="toggleDone(t.id)" class="size-4 accent-emerald-500">
+            <div class="flex-1">
+              <p :class="t.done ? 'line-through text-slate-400/70' : ''" x-text="t.title"></p>
+              <p class="text-[11px] text-slate-300/70 mt-0.5">Categoría: 
+                <span class="px-1 py-0.5 bg-white/10 border border-white/10 rounded" x-text="catName(t.category)"></span>
+              </p>
+            </div>
+            <button @click="askDeleteTask(t.id)" class="btn bg-rose-500/80 hover:bg-rose-500 text-white rounded-md text-xs flex items-center gap-1">🗑</button>
+          </div>
+        </template>
+      </div>
+
+      <footer class="pt-1 text-xs text-slate-200/70">
+        <span x-text="`${leftCount()} pendientes · ${doneCount()} completados · ${tasks.length} total`"></span>
+      </footer>
+    </section>
+    <!-- ===== Modal de Confirmación ===== -->
+    <template x-if="confirm.show">
+      <div class="fixed inset-0 z-50 flex items-center justify-center">
+        <!-- fondo -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="confirm.show=false"></div>
+    
+        <!-- tarjeta -->
+        <div class="relative glass border border-white/15 rounded-xl w-full max-w-sm p-4">
+          <div class="flex items-start gap-2">
+            <div class="mt-0.5">
+              <svg class="w-5 h-5 text-rose-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01M5.07 19h13.86A2 2 0 0021 17.13L13.93 3.52a2 2 0 00-3.86 0L3 17.13A2 2 0 005.07 19z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold mb-1">Confirmar acción</h3>
+              <p class="text-slate-200/80 text-sm" x-text="confirm.message"></p>
+            </div>
+          </div>
+    
+          <div class="mt-4 flex justify-end gap-2">
+            <button @click="confirm.show=false"
+              class="btn rounded-md border border-white/20 hover:bg-white/5">Cancelar</button>
+            <button @click="confirmYes()"
+              class="btn rounded-md bg-rose-500/90 hover:bg-rose-500 text-white">Sí, continuar</button>
+          </div>
+          <!-- cerrar -->
+          <button @click="confirm.show=false"
+            class="absolute top-2 right-2 text-slate-200/70 hover:text-white" aria-label="Cerrar">✕</button>
+        </div>
+    
+    </template>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script src="public/src/components/userExp.js"></script>
+
+</body>
+</html>

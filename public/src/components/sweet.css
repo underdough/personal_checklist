@@ -1,0 +1,222 @@
+:root {
+  color-scheme: light dark;
+}
+body {
+  font-family: "Work Sans", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+    Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  font-size: 13px;
+}
+
+/* Fondo aurora animado */
+.bg-aurora {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(
+      ellipse at 15% 20%,
+      rgba(57, 169, 0, 0.25),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 85% 25%,
+      rgba(12, 66, 102, 0.25),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 50% 85%,
+      rgba(255, 255, 255, 0.05),
+      transparent 60%
+    ),
+    linear-gradient(135deg, #0b1320 0%, #0e1a14 70%);
+  background-size: 280% 280%;
+  animation: auroraMove 35s ease-in-out infinite;
+}
+
+/*Keyframes ------------*/
+@keyframes auroraMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* opcional: animación suave modal */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+[x-cloak] {
+  display: none !important;
+}
+.fixed.inset-0 > .relative {
+  animation: popIn 0.15s ease-out;
+}
+
+/* Glass */
+.glass {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.34);
+}
+.glass-2 {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  border-radius: 0.6rem;
+}
+
+/* Scrollbar */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+}
+
+/* Botones */
+.btn {
+  transition: background-color 0.2s, border-color 0.2s, opacity 0.2s,
+    transform 0.1s;
+  font-size: 0.8rem;
+  padding: 0.32rem 0.6rem;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* Estructura y aire */
+main {
+  padding: 1rem 0.75rem;
+}
+aside,
+section {
+  padding: 0.9rem;
+  gap: 0.7rem;
+}
+header,
+.glass-2,
+form,
+footer {
+  margin-bottom: 0.55rem;
+}
+header {
+  gap: 0.8rem;
+}
+.group {
+  margin-bottom: 0.55rem;
+  padding: 0.6rem 0.8rem;
+  align-items: center;
+}
+.group:last-child {
+  margin-bottom: 0;
+}
+
+/* Form compact */
+form {
+  display: grid;
+  gap: 0.6rem;
+}
+form input,
+form select,
+form button {
+  min-height: 34px;
+  font-size: 0.85rem;
+}
+
+/* Grid: por defecto 3 cols, en modo compacto (sin select) → 2 cols */
+@media (min-width: 640px) {
+  form {
+    grid-template-columns: 1fr 190px 120px;
+  }
+  form[data-compact="true"] {
+    grid-template-columns: 1fr 120px;
+  }
+}
+
+/* Selects y options (texto negro en el desplegable) */
+select {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+select:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5);
+}
+select option,
+select optgroup,
+option {
+  color: #000 !important;
+  background: #f5f7fa !important;
+  font-weight: 500;
+  font-family: "Work Sans", sans-serif;
+}
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #fff;
+}
+select:-moz-focusring * {
+  color: #000 !important;
+  text-shadow: none;
+}
+@supports (-webkit-touch-callout: none) {
+  select option {
+    -webkit-text-fill-color: #000 !important;
+  }
+}
+
+/* Titulares y textos pequeños */
+h1 {
+  font-size: 1.28rem;
+  font-weight: 600;
+}
+h2 {
+  font-size: 1.02rem;
+  font-weight: 600;
+}
+p,
+span,
+button,
+input,
+label {
+  font-size: 0.86rem;
+}
+
+@media (min-width: 768px) {
+  main {
+    padding: 1.35rem 0.9rem;
+  }
+  aside,
+  section {
+    padding: 1rem;
+    gap: 0.85rem;
+  }
+}
