@@ -4,7 +4,7 @@ A lightweight and elegant **personal checklist web app** built with **Tailwind C
 Fully client-side, with **local persistence**, **category filters**, and a **glassmorphism UI**.
 
 ##### preview 
-(\public\src\components\imgs\preview.png)
+(/public/src/components/imgs/preview.png)
 ---
 
 ## ✨ Features
